@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Intent;
@@ -43,116 +45,64 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_IMAGE_CAPTURE =672;
-    private String imageFilePath;
-    private Uri photoUri;
+    private Button btn_1;
+    private Button btn_2;
+    private Button btn_3;
+    private Button btn_4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //권한체크
-        TedPermission.with(getApplication())
-                .setPermissionListener(permissionListener)
-                .setRationaleMessage("카메라 권한이 필요합니다.")
-                .setDeniedMessage("거부하셨습니다.")
-                .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA)
-                .check();
+        btn_1 = (Button)findViewById(R.id.btn_1);
+        btn_2 = (Button)findViewById(R.id.btn_2);
+        btn_3 = (Button)findViewById(R.id.btn_3);
+        btn_4 = (Button)findViewById(R.id.btn_4);
 
-        findViewById(R.id.btn_capture).setOnClickListener(new View.OnClickListener() {
+        btn_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(intent.resolveActivity(getPackageManager())!=null){
-                    File photoFile = null;
-                    try {
-                        photoFile=createImageFile();
-                    }catch (IOException e){
+                FragmentTransaction transaction =getSupportFragmentManager().beginTransaction();
+                Fragment1 fragment1 = new Fragment1();
+                transaction.replace(R.id.frame,fragment1);
 
-                    }
-
-                    if(photoFile!=null){
-                        photoUri= FileProvider.getUriForFile(getApplicationContext(),getPackageName(),photoFile);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri);
-                        startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
-                    }
-                }
+                transaction.commit();
             }
         });
 
+        btn_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction =getSupportFragmentManager().beginTransaction();
+                Fragment2 fragment2 = new Fragment2();
+                transaction.replace(R.id.frame,fragment2);
 
-    }
-
-    private File createImageFile() throws IOException {
-        String timeStamp= new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "TEST_"+timeStamp+"_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,
-                "jpg",
-                storageDir
-        );
-
-        imageFilePath=image.getAbsolutePath();
-        return image;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && requestCode == RESULT_OK) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
-            ExifInterface exif=null;
-            try{
-                exif=new ExifInterface(imageFilePath);
-            }catch (IOException e){
-                e.printStackTrace();
+                transaction.commit();
             }
+        });
 
-            int exifOrientation;
-            int exifDegree;
+        btn_3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction =getSupportFragmentManager().beginTransaction();
+                Fragment3 fragment3 = new Fragment3();
+                transaction.replace(R.id.frame,fragment3);
 
-            if(exif!=null){
-                exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,ExifInterface.ORIENTATION_NORMAL);
-                exifDegree = exifOrientationToDegress(exifOrientation);
-            }else{
-                exifDegree=0;
+                transaction.commit();
             }
+        });
 
-            ((ImageView)findViewById(R.id.iv_result)).setImageBitmap(rotate(bitmap,exifDegree));
+        btn_4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction =getSupportFragmentManager().beginTransaction();
+                Fragment4 fragment4 = new Fragment4();
+                transaction.replace(R.id.frame,fragment4);
 
-        }
+                transaction.commit();
+            }
+        });
+
     }
-
-    private int exifOrientationToDegress(int exifOrientation){
-        if(exifOrientation==ExifInterface.ORIENTATION_ROTATE_90){
-            return 90;
-        }else if (exifOrientation==ExifInterface.ORIENTATION_ROTATE_180){
-            return 180;
-        }else if (exifOrientation==ExifInterface.ORIENTATION_ROTATE_270){
-            return 270;
-        }else{
-            return 0;
-        }
-    }
-
-    private Bitmap rotate(Bitmap bitmap,float degree){
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
-        return Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-    }
-
-
-    PermissionListener permissionListener =new PermissionListener() {
-        @Override
-        public void onPermissionGranted() {
-            Toast.makeText(getApplicationContext(),"접근 권한 허용",Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-            Toast.makeText(getApplicationContext(),"접근 거부됨",Toast.LENGTH_SHORT).show();
-        }
-    };
-
 }
