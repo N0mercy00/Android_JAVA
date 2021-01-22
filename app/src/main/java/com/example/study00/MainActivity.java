@@ -51,46 +51,29 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btn_dialog;
-    TextView tv_result;
+    Button btn_start,btn_stop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn_dialog = (Button)findViewById(R.id.btn_dialog);
-        tv_result = (TextView)findViewById(R.id.tv_result);
+        btn_start=(Button)findViewById(R.id.btn_start);
+        btn_stop=(Button)findViewById(R.id.btn_stop);
 
-        btn_dialog.setOnClickListener(new View.OnClickListener() {
+        btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
-                ad.setIcon(R.mipmap.ic_launcher);
-                ad.setTitle("title");
-                ad.setMessage("is sample message?");
-
-                final EditText et = new EditText(MainActivity.this);
-                ad.setView(et);
-
-                ad.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String result = et.getText().toString();
-                        tv_result.setText(result);
-                        dialog.dismiss();
-                    }
-                });
-
-                ad.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                ad.show();
+                startService(new Intent(getApplicationContext(),MusicService.class));
             }
         });
+        btn_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent(getApplicationContext(),MusicService.class));
+            }
+        });
+
 
     }
 
